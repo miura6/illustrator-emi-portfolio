@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理パネル - Illustrator Emi</title>
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .admin-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .btn {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        .btn:hover {
+            background: #45a049;
+        }
+        .btn-danger {
+            background: #f44336;
+        }
+        .btn-danger:hover {
+            background: #da190b;
+        }
+        .stats {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .file-upload {
+            border: 2px dashed #ddd;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+        }
+        .file-upload:hover {
+            border-color: #4CAF50;
+        }
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .gallery-item {
+            border: 1px solid #eee;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            background: #fafafa;
+        }
+        .gallery-item h4 {
+            margin-top: 0;
+            color: #333;
+        }
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .image-item {
+            position: relative;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .image-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+        .image-item .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(244, 67, 54, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .tab-container {
+            margin-bottom: 20px;
+        }
+        .tab-buttons {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        .tab-btn.active {
+            border-bottom-color: #4CAF50;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <h1>📊 管理パネル - Illustrator Emi</h1>
+        
+        <!-- 統計情報 -->
+        <div class="stats">
+            <h3>📈 統計情報</h3>
+            <p>総閲覧数: <span id="total-visitors">0</span>回</p>
+            <p>今日の閲覧数: <span id="today-visitors">0</span>回</p>
+            <p>最終更新: <span id="last-update">-</span></p>
+        </div>
+
+        <!-- タブナビゲーション -->
+        <div class="tab-container">
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="showTab('basic')">📝 基本情報</button>
+                <button class="tab-btn" onclick="showTab('gallery')">🖼️ ギャラリー管理</button>
+                <button class="tab-btn" onclick="showTab('pricing')">💰 料金設定</button>
+                <button class="tab-btn" onclick="showTab('news')">📢 お知らせ</button>
+                <button class="tab-btn" onclick="showTab('images')">📁 画像管理</button>
+            </div>
+        </div>
+
+        <!-- 基本情報タブ -->
+        <div id="basic" class="tab-content active">
+            <div class="section">
+                <h3>📝 基本情報編集</h3>
+                <div class="form-group">
+                    <label>サイトタイトル</label>
+                    <input type="text" id="site-title" value="Illustrator Emi">
+                </div>
+                <div class="form-group">
+                    <label>メインキャッチコピー</label>
+                    <textarea id="main-catch">心に残る"動物モチーフ"で、ブランドにあたたかさと個性を。</textarea>
+                </div>
+                <div class="form-group">
+                    <label>説明文</label>
+                    <textarea id="description">動物イラストを専門としたイラストレーターとして、店舗ロゴ・SNSアイコン・パッケージ・グッズ展開など、見る人の心を和ませる、印象的なデザインをご提案いたします。</textarea>
+                </div>
+                <div class="form-group">
+                    <label>SNSリンク（Instagram）</label>
+                    <input type="url" id="instagram-link" placeholder="https://instagram.com/your-account">
+                </div>
+                <div class="form-group">
+                    <label>SNSリンク（Twitter）</label>
+                    <input type="url" id="twitter-link" placeholder="https://twitter.com/your-account">
+                </div>
+            </div>
+        </div>
+
+        <!-- ギャラリー管理タブ -->
+        <div id="gallery" class="tab-content">
+            <div class="section">
+                <h3>🖼️ ギャラリー管理</h3>
+                <div id="gallery-items">
+                    <!-- ギャラリーアイテムが動的に生成されます -->
+                </div>
+                <button class="btn" onclick="addGalleryItem()">➕ 新しい作品を追加</button>
+            </div>
+        </div>
+
+        <!-- 料金設定タブ -->
+        <div id="pricing" class="tab-content">
+            <div class="section">
+                <h3>💰 料金設定</h3>
+                <div class="form-group">
+                    <label>イラスト料金</label>
+                    <input type="text" id="illustration-price" value="5,000円〜">
+                </div>
+                <div class="form-group">
+                    <label>修正料金</label>
+                    <input type="text" id="revision-price" value="2回目以降: 5,000円">
+                </div>
+                <div class="form-group">
+                    <label>小物追加料金</label>
+                    <input type="text" id="accessory-price" value="1,000円">
+                </div>
+            </div>
+        </div>
+
+        <!-- お知らせタブ -->
+        <div id="news" class="tab-content">
+            <div class="section">
+                <h3>📢 お知らせ管理</h3>
+                <div class="form-group">
+                    <label>お知らせタイトル</label>
+                    <input type="text" id="news-title" value="現在、お知らせはありません。">
+                </div>
+                <div class="form-group">
+                    <label>お知らせ内容</label>
+                    <textarea id="news-content">今後の活動については、こちらで随時更新していきます。</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- 画像管理タブ -->
+        <div id="images" class="tab-content">
+            <div class="section">
+                <h3>📁 画像管理</h3>
+                
+                <!-- スライドショー画像 -->
+                <h4>🖼️ スライドショー画像</h4>
+                <div class="file-upload">
+                    <p>新しいスライドショー画像をアップロード</p>
+                    <input type="file" id="slideshow-upload" accept="image/*" multiple>
+                </div>
+                <div id="slideshow-images" class="image-grid">
+                    <!-- スライドショー画像が表示されます -->
+                </div>
+
+                <!-- コンセプト画像 -->
+                <h4>🎨 コンセプト画像</h4>
+                <div class="file-upload">
+                    <p>新しいコンセプト画像をアップロード</p>
+                    <input type="file" id="concept-upload" accept="image/*">
+                </div>
+                <div id="concept-images" class="image-grid">
+                    <!-- コンセプト画像が表示されます -->
+                </div>
+
+                <!-- ギャラリー画像 -->
+                <h4>🖼️ ギャラリー画像</h4>
+                <div class="file-upload">
+                    <p>新しいギャラリー画像をアップロード</p>
+                    <input type="file" id="gallery-upload" accept="image/*" multiple>
+                </div>
+                <div id="gallery-images" class="image-grid">
+                    <!-- ギャラリー画像が表示されます -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 保存ボタン -->
+        <div style="text-align: center; margin-top: 30px;">
+            <button class="btn" onclick="saveChanges()">💾 変更を保存</button>
+            <button class="btn" onclick="previewChanges()" style="background: #2196F3;">👁️ プレビュー</button>
+            <button class="btn" onclick="exportData()" style="background: #FF9800;">📤 データエクスポート</button>
+            <button class="btn" onclick="importData()" style="background: #9C27B0;">📥 データインポート</button>
+        </div>
+    </div>
+
+    <script>
+        let galleryItems = [];
+        let slideshowImages = [];
+        let conceptImages = [];
+        let galleryImages = [];
+
+        // タブ切り替え
+        function showTab(tabName) {
+            // すべてのタブコンテンツを非表示
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // すべてのタブボタンからactiveクラスを削除
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // 選択されたタブを表示
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // 統計情報の読み込み
+        function loadStats() {
+            const totalVisitors = localStorage.getItem('visitorCount') || 0;
+            const todayVisitors = localStorage.getItem('todayVisitors') || 0;
+            const lastUpdate = localStorage.getItem('lastUpdate') || '-';
+            
+            document.getElementById('total-visitors').textContent = totalVisitors;
+            document.getElementById('today-visitors').textContent = todayVisitors;
+            document.getElementById('last-update').textContent = lastUpdate;
+        }
+
+        // ギャラリーアイテム追加
+        function addGalleryItem() {
+            const item = {
+                id: Date.now(),
+                title: '新しい作品',
+                description: '作品の説明を入力してください',
+                image: null
+            };
+            galleryItems.push(item);
+            renderGalleryItems();
+        }
+
+        // ギャラリーアイテム削除
+        function removeGalleryItem(id) {
+            galleryItems = galleryItems.filter(item => item.id !== id);
+            renderGalleryItems();
+        }
+
+        // ギャラリーアイテム表示
+        function renderGalleryItems() {
+            const container = document.getElementById('gallery-items');
+            container.innerHTML = '';
+            
+            galleryItems.forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'gallery-item';
+                itemDiv.innerHTML = `
+                    <h4>作品 ${index + 1}</h4>
+                    <div class="form-group">
+                        <label>タイトル</label>
+                        <input type="text" value="${item.title}" onchange="updateGalleryItem(${item.id}, 'title', this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label>説明</label>
+                        <textarea onchange="updateGalleryItem(${item.id}, 'description', this.value)">${item.description}</textarea>
+                    </div>
+                    <div class="file-upload">
+                        <p>画像をアップロード</p>
+                        <input type="file" accept="image/*" onchange="updateGalleryItemImage(${item.id}, this)">
+                    </div>
+                    ${item.image ? `<img src="${item.image}" class="image-preview">` : ''}
+                    <button class="btn btn-danger" onclick="removeGalleryItem(${item.id})">🗑️ 削除</button>
+                `;
+                container.appendChild(itemDiv);
+            });
+        }
+
+        // ギャラリーアイテム更新
+        function updateGalleryItem(id, field, value) {
+            const item = galleryItems.find(item => item.id === id);
+            if (item) {
+                item[field] = value;
+            }
+        }
+
+        // ギャラリーアイテム画像更新
+        function updateGalleryItemImage(id, input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const item = galleryItems.find(item => item.id === id);
+                    if (item) {
+                        item.image = e.target.result;
+                        renderGalleryItems();
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // 画像アップロード処理
+        function handleImageUpload(input, imageArray, containerId) {
+            const files = Array.from(input.files);
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imageData = {
+                        id: Date.now() + Math.random(),
+                        src: e.target.result,
+                        name: file.name
+                    };
+                    imageArray.push(imageData);
+                    renderImages(containerId, imageArray);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // 画像表示
+        function renderImages(containerId, imageArray) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            imageArray.forEach(image => {
+                const imageDiv = document.createElement('div');
+                imageDiv.className = 'image-item';
+                imageDiv.innerHTML = `
+                    <img src="${image.src}" alt="${image.name}">
+                    <button class="remove-btn" onclick="removeImage('${containerId}', ${image.id})">×</button>
+                `;
+                container.appendChild(imageDiv);
+            });
+        }
+
+        // 画像削除
+        function removeImage(containerId, imageId) {
+            let imageArray;
+            switch(containerId) {
+                case 'slideshow-images':
+                    imageArray = slideshowImages;
+                    break;
+                case 'concept-images':
+                    imageArray = conceptImages;
+                    break;
+                case 'gallery-images':
+                    imageArray = galleryImages;
+                    break;
+            }
+            
+            if (imageArray) {
+                const index = imageArray.findIndex(img => img.id === imageId);
+                if (index > -1) {
+                    imageArray.splice(index, 1);
+                    renderImages(containerId, imageArray);
+                }
+            }
+        }
+
+        // 変更を保存
+        function saveChanges() {
+            const changes = {
+                siteTitle: document.getElementById('site-title').value,
+                mainCatch: document.getElementById('main-catch').value,
+                description: document.getElementById('description').value,
+                instagramLink: document.getElementById('instagram-link').value,
+                twitterLink: document.getElementById('twitter-link').value,
+                illustrationPrice: document.getElementById('illustration-price').value,
+                revisionPrice: document.getElementById('revision-price').value,
+                accessoryPrice: document.getElementById('accessory-price').value,
+                newsTitle: document.getElementById('news-title').value,
+                newsContent: document.getElementById('news-content').value,
+                galleryItems: galleryItems,
+                slideshowImages: slideshowImages,
+                conceptImages: conceptImages,
+                galleryImages: galleryImages
+            };
+
+            localStorage.setItem('siteChanges', JSON.stringify(changes));
+            localStorage.setItem('lastUpdate', new Date().toLocaleString());
+            
+            alert('変更が保存されました！');
+            loadStats();
+        }
+
+        // データエクスポート
+        function exportData() {
+            const data = localStorage.getItem('siteChanges');
+            const blob = new Blob([data], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'site-data.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // データインポート
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        localStorage.setItem('siteChanges', JSON.stringify(data));
+                        loadSavedChanges();
+                        alert('データがインポートされました！');
+                    } catch (error) {
+                        alert('ファイルの読み込みに失敗しました。');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        // プレビュー
+        function previewChanges() {
+            window.open('index.html', '_blank');
+        }
+
+        // 保存された変更を読み込み
+        function loadSavedChanges() {
+            const saved = localStorage.getItem('siteChanges');
+            if (saved) {
+                const changes = JSON.parse(saved);
+                
+                // 基本情報
+                document.getElementById('site-title').value = changes.siteTitle || '';
+                document.getElementById('main-catch').value = changes.mainCatch || '';
+                document.getElementById('description').value = changes.description || '';
+                document.getElementById('instagram-link').value = changes.instagramLink || '';
+                document.getElementById('twitter-link').value = changes.twitterLink || '';
+                
+                // 料金
+                document.getElementById('illustration-price').value = changes.illustrationPrice || '';
+                document.getElementById('revision-price').value = changes.revisionPrice || '';
+                document.getElementById('accessory-price').value = changes.accessoryPrice || '';
+                
+                // お知らせ
+                document.getElementById('news-title').value = changes.newsTitle || '';
+                document.getElementById('news-content').value = changes.newsContent || '';
+                
+                // ギャラリー
+                galleryItems = changes.galleryItems || [];
+                renderGalleryItems();
+                
+                // 画像
+                slideshowImages = changes.slideshowImages || [];
+                conceptImages = changes.conceptImages || [];
+                galleryImages = changes.galleryImages || [];
+                
+                renderImages('slideshow-images', slideshowImages);
+                renderImages('concept-images', conceptImages);
+                renderImages('gallery-images', galleryImages);
+            }
+        }
+
+        // イベントリスナー設定
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStats();
+            loadSavedChanges();
+            
+            // 画像アップロードイベント
+            document.getElementById('slideshow-upload').addEventListener('change', function(e) {
+                handleImageUpload(this, slideshowImages, 'slideshow-images');
+            });
+            
+            document.getElementById('concept-upload').addEventListener('change', function(e) {
+                handleImageUpload(this, conceptImages, 'concept-images');
+            });
+            
+            document.getElementById('gallery-upload').addEventListener('change', function(e) {
+                handleImageUpload(this, galleryImages, 'gallery-images');
+            });
+        });
+    </script>
+</body>
+</html> 

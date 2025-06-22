@@ -8,6 +8,27 @@ document.addEventListener('DOMContentLoaded', function() {
     initHeaderScroll();
     initSlideshow();
     initContactForm();
+    updateVisitorCount();
+    applyAdminChanges();
+    
+    // 新しいアニメーション機能を初期化
+    initParallax();
+    initMouseFollow();
+    initTypingEffect();
+    initParticles();
+    
+    // スクロールアニメーション用のクラスを追加
+    const sections = document.querySelectorAll('section');
+    sections.forEach(section => {
+        section.classList.add('scroll-reveal');
+    });
+    
+    // パララックス効果用のクラスを追加
+    const heroContent = document.querySelector('.hero-content');
+    if (heroContent) {
+        heroContent.classList.add('parallax');
+        heroContent.dataset.speed = '0.3';
+    }
 });
 
 // Mobile Menu Toggle
@@ -97,21 +118,18 @@ function initScrollAnimations() {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
     };
-    
-    const observer = new IntersectionObserver(function(entries) {
+
+    const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.classList.add('fade-in-up');
+                entry.target.classList.add('revealed');
             }
         });
     }, observerOptions);
-    
-    // Observe elements for animation
-    const animateElements = document.querySelectorAll('.menu-item, .goods-item, .direction-item, /*.concept-content,*/ .menu-intro, .gallery-intro, .goods-intro, .news-content, .access-info, .access-directions');
-    
-    animateElements.forEach(el => {
-        observer.observe(el);
-    });
+
+    // アニメーション対象要素を監視
+    const animatedElements = document.querySelectorAll('.scroll-reveal');
+    animatedElements.forEach(el => observer.observe(el));
 }
 
 // Header Scroll Effect
@@ -155,16 +173,16 @@ window.addEventListener('load', function() {
 });
 
 // Parallax Effect for Hero Section
-function initParallaxEffect() {
-    const hero = document.querySelector('.hero');
-    
-    window.addEventListener('scroll', function() {
+function initParallax() {
+    window.addEventListener('scroll', () => {
         const scrolled = window.pageYOffset;
-        const rate = scrolled * -0.5;
+        const parallaxElements = document.querySelectorAll('.parallax');
         
-        if (hero) {
-            hero.style.transform = `translateY(${rate}px)`;
-        }
+        parallaxElements.forEach(element => {
+            const speed = element.dataset.speed || 0.5;
+            const yPos = -(scrolled * speed);
+            element.style.transform = `translateY(${yPos}px)`;
+        });
     });
 }
 
@@ -404,4 +422,334 @@ function initContactForm() {
 // Slideshow for Concept Section
 function initConceptSlideshow() {
     // This function can be created if needed for more complex slideshow controls
-} 
+}
+
+// 閲覧数カウンター機能
+function updateVisitorCount() {
+    let count = localStorage.getItem('visitorCount') || 0;
+    count = parseInt(count) + 1;
+    localStorage.setItem('visitorCount', count);
+    
+    // カウンター表示要素があれば更新
+    const counterElement = document.getElementById('visitor-counter');
+    if (counterElement) {
+        counterElement.textContent = count.toLocaleString();
+    }
+}
+
+// 管理パネルからの変更を反映
+function applyAdminChanges() {
+    const saved = localStorage.getItem('siteChanges');
+    if (saved) {
+        const changes = JSON.parse(saved);
+        
+        // サイトタイトル更新
+        if (changes.siteTitle) {
+            document.title = changes.siteTitle;
+            const logoTitle = document.querySelector('.logo h1');
+            if (logoTitle) logoTitle.textContent = changes.siteTitle;
+        }
+        
+        // メインキャッチコピー更新
+        if (changes.mainCatch) {
+            const catchElement = document.querySelector('.hero-description strong');
+            if (catchElement) catchElement.textContent = changes.mainCatch;
+        }
+        
+        // SNSリンク更新
+        if (changes.instagramLink) {
+            const instagramLink = document.querySelector('.social-icons a[aria-label="Instagram"]');
+            if (instagramLink) instagramLink.href = changes.instagramLink;
+        }
+        if (changes.twitterLink) {
+            const twitterLink = document.querySelector('.social-icons a[aria-label="Twitter"]');
+            if (twitterLink) twitterLink.href = changes.twitterLink;
+        }
+        
+        // 料金更新
+        if (changes.illustrationPrice) {
+            const priceElements = document.querySelectorAll('.price');
+            if (priceElements[0]) priceElements[0].textContent = changes.illustrationPrice;
+        }
+        if (changes.revisionPrice) {
+            const priceElements = document.querySelectorAll('.price');
+            if (priceElements[1]) priceElements[1].textContent = changes.revisionPrice;
+        }
+        if (changes.accessoryPrice) {
+            const priceElements = document.querySelectorAll('.price');
+            if (priceElements[2]) priceElements[2].textContent = changes.accessoryPrice;
+        }
+        
+        // ギャラリー更新
+        if (changes.galleryItems && changes.galleryItems.length > 0) {
+            updateGalleryFromAdmin(changes.galleryItems);
+        }
+        
+        // お知らせ更新
+        if (changes.newsTitle) {
+            const newsTitle = document.querySelector('.news-content h3');
+            if (newsTitle) newsTitle.textContent = changes.newsTitle;
+        }
+        if (changes.newsContent) {
+            const newsContent = document.querySelector('.news-list p');
+            if (newsContent) newsContent.textContent = changes.newsContent;
+        }
+        
+        // 画像更新
+        if (changes.slideshowImages && changes.slideshowImages.length > 0) {
+            updateSlideshowImages(changes.slideshowImages);
+        }
+        if (changes.conceptImages && changes.conceptImages.length > 0) {
+            updateConceptImages(changes.conceptImages);
+        }
+    }
+}
+
+// ギャラリーを管理パネルから更新
+function updateGalleryFromAdmin(galleryItems) {
+    const galleryGrid = document.querySelector('.gallery-grid');
+    const galleryNav = document.querySelector('.gallery-nav');
+    
+    if (galleryGrid && galleryNav) {
+        // ギャラリーグリッドをクリア
+        galleryGrid.innerHTML = '';
+        galleryNav.innerHTML = '';
+        
+        // 新しいギャラリーアイテムを追加
+        galleryItems.forEach((item, index) => {
+            const galleryItem = document.createElement('div');
+            galleryItem.className = 'gallery-item' + (index === 0 ? ' active' : '');
+            galleryItem.setAttribute('data-category', `work${index + 1}`);
+            
+            galleryItem.innerHTML = `
+                <div class="gallery-image">
+                    <img src="${item.image || `assets/gallery-${index + 1}.png`}" alt="${item.title}">
+                </div>
+                <div class="gallery-description">
+                    <h4>${item.title}</h4>
+                    <p>${item.description}</p>
+                </div>
+            `;
+            
+            galleryGrid.appendChild(galleryItem);
+            
+            // ナビゲーションボタンを追加
+            const navBtn = document.createElement('button');
+            navBtn.className = 'gallery-nav-btn' + (index === 0 ? ' active' : '');
+            navBtn.setAttribute('data-category', `work${index + 1}`);
+            navBtn.textContent = `WORK ${index + 1}`;
+            navBtn.addEventListener('click', function() {
+                showGalleryItem(`work${index + 1}`);
+            });
+            
+            galleryNav.appendChild(navBtn);
+        });
+        
+        // ギャラリー機能を再初期化
+        initGallery();
+    }
+}
+
+// スライドショー画像を更新
+function updateSlideshowImages(slideshowImages) {
+    const slideshowContainer = document.querySelector('.slideshow-container');
+    if (slideshowContainer && slideshowImages.length > 0) {
+        slideshowContainer.innerHTML = '';
+        
+        slideshowImages.forEach((image, index) => {
+            const slide = document.createElement('div');
+            slide.className = 'slide' + (index === 0 ? ' active' : '');
+            slide.style.backgroundImage = `url('${image.src}')`;
+            slideshowContainer.appendChild(slide);
+        });
+        
+        // スライドショーを再初期化
+        initSlideshow();
+    }
+}
+
+// コンセプト画像を更新
+function updateConceptImages(conceptImages) {
+    const conceptTrack = document.querySelector('.concept-slideshow-track');
+    if (conceptTrack && conceptImages.length > 0) {
+        conceptTrack.innerHTML = '';
+        
+        conceptImages.forEach(image => {
+            const slide = document.createElement('div');
+            slide.className = 'concept-slide';
+            slide.innerHTML = `<img src="${image.src}" alt="コンセプトを表現するかわいい猫のイラスト">`;
+            conceptTrack.appendChild(slide);
+        });
+    }
+}
+
+// ギャラリー機能の初期化
+function initGallery() {
+    const galleryNavBtns = document.querySelectorAll('.gallery-nav-btn');
+    const galleryItems = document.querySelectorAll('.gallery-item');
+    
+    galleryNavBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const category = this.getAttribute('data-category');
+            showGalleryItem(category);
+        });
+    });
+}
+
+// ギャラリーアイテム表示
+function showGalleryItem(category) {
+    // すべてのアイテムとボタンを非アクティブに
+    document.querySelectorAll('.gallery-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    document.querySelectorAll('.gallery-nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // 選択されたアイテムとボタンをアクティブに
+    const selectedItem = document.querySelector(`[data-category="${category}"]`);
+    const selectedBtn = document.querySelector(`[data-category="${category}"]`);
+    
+    if (selectedItem) selectedItem.classList.add('active');
+    if (selectedBtn) selectedBtn.classList.add('active');
+}
+
+// マウス追従効果
+function initMouseFollow() {
+    const cursor = document.createElement('div');
+    cursor.className = 'custom-cursor';
+    document.body.appendChild(cursor);
+
+    document.addEventListener('mousemove', (e) => {
+        cursor.style.left = e.clientX + 'px';
+        cursor.style.top = e.clientY + 'px';
+    });
+
+    // ホバー効果
+    const hoverElements = document.querySelectorAll('a, button, .gallery-item, .menu-item');
+    hoverElements.forEach(element => {
+        element.addEventListener('mouseenter', () => {
+            cursor.classList.add('hover');
+        });
+        element.addEventListener('mouseleave', () => {
+            cursor.classList.remove('hover');
+        });
+    });
+}
+
+// テキストタイピング効果
+function initTypingEffect() {
+    const typingElement = document.querySelector('.font-accent-heading');
+    if (typingElement) {
+        const text = typingElement.textContent;
+        typingElement.textContent = '';
+        typingElement.style.borderRight = '2px solid var(--accent-color)';
+        
+        let i = 0;
+        const typeWriter = () => {
+            if (i < text.length) {
+                typingElement.textContent += text.charAt(i);
+                i++;
+                setTimeout(typeWriter, 100);
+            } else {
+                setTimeout(() => {
+                    typingElement.style.borderRight = 'none';
+                }, 1000);
+            }
+        };
+        
+        setTimeout(typeWriter, 1000);
+    }
+}
+
+// パーティクル効果
+function initParticles() {
+    const particleContainer = document.createElement('div');
+    particleContainer.className = 'particle-container';
+    document.body.appendChild(particleContainer);
+
+    for (let i = 0; i < 50; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 20 + 's';
+        particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+        particleContainer.appendChild(particle);
+    }
+}
+
+// カスタムカーソル用CSS
+const cursorStyles = `
+    .custom-cursor {
+        position: fixed;
+        width: 20px;
+        height: 20px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9999;
+        transition: all 0.1s ease;
+        mix-blend-mode: difference;
+    }
+    
+    .custom-cursor.hover {
+        transform: scale(2);
+        background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
+    }
+    
+    .particle-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+    }
+    
+    .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 50%;
+        animation: float linear infinite;
+    }
+    
+    @keyframes float {
+        0% {
+            transform: translateY(100vh) rotate(0deg);
+            opacity: 0;
+        }
+        10% {
+            opacity: 1;
+        }
+        90% {
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(-100px) rotate(360deg);
+            opacity: 0;
+        }
+    }
+    
+    .scroll-reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.8s ease;
+    }
+    
+    .scroll-reveal.revealed {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .parallax {
+        transition: transform 0.1s ease-out;
+    }
+`;
+
+// CSSを追加
+const styleSheet = document.createElement('style');
+styleSheet.textContent = cursorStyles;
+document.head.appendChild(styleSheet); 

@@ -4,6 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Illustrator Emi</title>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'GA_MEASUREMENT_ID');
+    </script>
+    
+    <!-- 
+    Google Analytics設定手順:
+    1. https://analytics.google.com でアカウント作成
+    2. プロパティ名: "Illustrator Emi Website"
+    3. データストリーム: "Illustrator Emi Main Site"
+    4. 測定ID（G-XXXXXXXXXX）を取得
+    5. 上記の "GA_MEASUREMENT_ID" を実際の測定IDに置き換え
+    -->
+    
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
@@ -19,6 +38,7 @@
                 </div>
                 <ul class="nav-menu">
                     <li><a href="#concept">CONCEPT</a></li>
+                    <li><a href="#process">PROCESS</a></li>
                     <li><a href="#menu">MENU</a></li>
                     <li><a href="#gallery">GALLERY</a></li>
                     <li><a href="#news">NEWS</a></li>
@@ -112,6 +132,38 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Section -->
+    <section id="process" class="process">
+        <div class="container">
+            <h2>WORK PROCESS</h2>
+            <div class="process-intro">
+                <h3>お客様との協働で、理想のデザインを実現します。</h3>
+            </div>
+            <div class="process-grid">
+                <div class="process-item">
+                    <div class="process-number">01</div>
+                    <h4>ヒアリング</h4>
+                    <p>お客様の想いやブランドの世界観をじっくりお聞かせください。どんな動物がお気に入りか、どんな雰囲気にしたいか、一緒にイメージを膨らませます。</p>
+                </div>
+                <div class="process-item">
+                    <div class="process-number">02</div>
+                    <h4>ラフ案作成</h4>
+                    <p>ヒアリング内容を基に、複数のラフ案を作成します。動物の種類、ポーズ、色合いなど、様々なバリエーションをご提案いたします。</p>
+                </div>
+                <div class="process-item">
+                    <div class="process-number">03</div>
+                    <h4>修正・調整</h4>
+                    <p>お気に入りの案を選んでいただき、細かな調整を重ねていきます。2回まで無料で修正いたしますので、ご納得いくまでお付き合いください。</p>
+                </div>
+                <div class="process-item">
+                    <div class="process-number">04</div>
+                    <h4>完成・納品</h4>
+                    <p>最終調整が完了したら、高解像度データで納品いたします。ロゴ、SNSアイコン、パッケージなど、様々な用途にご活用いただけます。</p>
                 </div>
             </div>
         </div>
@@ -263,6 +315,9 @@
     <footer class="footer">
         <div class="container">
             <p>© 2024 Illustrator Emi. All Rights Reserved.</p>
+            <div style="text-align: center; margin-top: 10px;">
+                <a href="admin.html" style="color: #666; text-decoration: none; font-size: 12px;">管理パネル</a>
+            </div>
         </div>
     </footer>
 
